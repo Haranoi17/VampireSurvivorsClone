@@ -1,6 +1,7 @@
 use sfml::{
-    graphics::{RenderTarget, Sprite, Texture, Transformable},
+    graphics::{RenderTarget, Sprite, Texture, Transformable, Text},
     system::Vector2f,
+    SfBox,
 };
 
 use crate::game::graphics::interfaces::{TextureConsumer, TextureName, TextureRepository};
@@ -12,7 +13,7 @@ pub struct Entity<'a> {
     sprite: Sprite<'a>,
 }
 
-impl<'a> Entity<'a> {
+impl Entity<'_> {
     pub fn new() -> Self {
         Self {
             position: Vector2f::new(0.0, 0.0),
@@ -30,10 +31,9 @@ impl<'a> Entity<'a> {
     }
 }
 
-impl<'a> TextureConsumer<'a> for Entity<'a>{
-    fn set_texture(&mut self, texture_repository: &'a impl TextureRepository) {
-        let texture: &Texture = texture_repository.get_texture(TextureName::Character );
-        self.sprite.set_texture(texture, false);
+impl TextureConsumer for Entity<'b> {
+    fn set_texture<'a, 't:'a>(&'a mut self, texture: &'t SfBox<Texture>) {
+        self.sprite.set_texture( texture, false);
         self.sprite.set_scale((0.1, 0.1));
     }
 }

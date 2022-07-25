@@ -32,7 +32,7 @@ impl GeneralTextureRepository {
 }
 
 impl TextureRepository for GeneralTextureRepository{
-    fn get_texture(&self, name: TextureName) -> &Texture {
+    fn get_texture<'a>(&'a self, name: TextureName) -> &'a SfBox<Texture> {
         self.textures.get(&name).unwrap()
     }
 }

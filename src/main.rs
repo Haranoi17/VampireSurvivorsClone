@@ -1,20 +1,16 @@
-
 mod game;
+use game::{Game, graphics::textures::GeneralTextureRepository};
+
+
 
 fn main() {
-    let mut window = create_window();
     let texture_repository = GeneralTextureRepository::new();
-    let mut drawables = vec![Entity::new()];
-    setup_textures(&mut drawables, &texture_repository);
+    let mut game = Game::new(&texture_repository);
 
-    while window.is_open() {
-        handle_events(&mut window);
-        clear_screen(&mut window);
-
-        for drawable in &drawables {
-            drawable.draw(&mut window);
-        }
-
-        window.display();
+    game.initialize();
+    while game.is_on() {
+        game.handle_events();
+        game.update();
+        game.render();
     }
 }
