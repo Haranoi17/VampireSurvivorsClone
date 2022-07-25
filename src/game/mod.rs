@@ -1,4 +1,4 @@
-use std::vec;
+use std::{vec, fmt::Debug};
 
 pub mod graphics;
 use graphics::{
@@ -31,13 +31,15 @@ impl<'a, 't:'a, T: TextureRepository> Game<'a, 't, T>{
         let vide_mode = VideoMode {
             width: 1280,
             height: 720,
-            ..Default::default()
+            ..VideoMode::desktop_mode()
         };
+
+        dbg!(VideoMode::desktop_mode());
 
         Self {
             window: RenderWindow::new(
                 vide_mode,
-                "test",
+                "",
                 Style::DEFAULT,
                 &ContextSettings::default(),
             ),

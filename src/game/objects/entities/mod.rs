@@ -31,9 +31,9 @@ impl Entity<'_> {
     }
 }
 
-impl TextureConsumer for Entity<'b> {
-    fn set_texture<'a, 't:'a>(&'a mut self, texture: &'t SfBox<Texture>) {
-        self.sprite.set_texture( texture, false);
+impl<'b, 't:'b> TextureConsumer<'t> for Entity<'b> {
+    fn set_texture<'a>(&'a mut self, texture: &'t SfBox<Texture>) where 't:'a{
+        self.sprite.set_texture(  &texture, false);
         self.sprite.set_scale((0.1, 0.1));
     }
 }
