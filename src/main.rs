@@ -1,6 +1,24 @@
+#[allow(non_snake_case)]
+mod Animations;
+
+#[allow(non_snake_case)]
+
+mod CollisionSystem;
+
+#[allow(non_snake_case)]
+mod MathUtilities;
+
+#[allow(non_snake_case)]
+mod Objects;
+use CollisionSystem::{Collider, Collidable};
+use Objects::{
+    Interfaces::{Drawable, Initializable, Updatable},
+    Player::Player, Enemy::Enemy,
+};
+
 use sfml::{
-    graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture, Transformable},
-    system::{Vector2f, Clock},
+    graphics::{Color, RenderTarget, RenderWindow},
+    system::Clock,
     window::{ContextSettings, Event, Style, VideoMode},
 };
 
@@ -15,15 +33,12 @@ fn create_window() -> RenderWindow {
 }
 
 fn main() {
+    let mut player = Player::new();
+    let mut enemy = Enemy::new();
+
+    player.initialize();
+
     let mut window = create_window();
-
-    let texture = Texture::from_file("resources/character.png").unwrap();
-    let mut player = Sprite::new();
-    player.set_texture(&texture, true);
-    player.set_scale((0.1, 0.1));
-
-    let mut player_pos = Vector2f::new(0.0, 0.0);
-    let mut player_dir = Vector2f::new(0.0, 0.0);
 
     let mut timer = Clock::start();
 
@@ -35,26 +50,22 @@ fn main() {
             }
         }
 
-        player_dir = Vector2f::new(0.0, 0.0);
-        if sfml::window::Key::A.is_pressed() {
-            player_dir += Vector2f::new(-1.0, 0.0);
-        }
-        if sfml::window::Key::D.is_pressed() {
-            player_dir += Vector2f::new(1.0, 0.0);
-        }
-        if sfml::window::Key::W.is_pressed() {
-            player_dir += Vector2f::new(0.0, -1.0);
-        }
-        if sfml::window::Key::S.is_pressed() {
-            player_dir += Vector2f::new(0.0, 1.0);
-        }
-
-        let dt = timer.elapsed_time().as_seconds();
+        let delta_time = timer.elapsed_time().as_seconds();
         timer.restart();
-        player_pos += player_dir*dt*100.0;
-        player.set_position(player_pos);
+
+        player.update(delta_time);
+
+        let result = Collider::collide(player.get_collider(), enemy.get_collider());
+        println!("{}",result);
+
         window.clear(Color::BLACK);
-        window.draw(&player);
+
+
+        player.draw(&mut window);
+        enemy.draw(&mut window);
+
+
+
         window.display();
     }
 }
