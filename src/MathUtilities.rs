@@ -1,5 +1,5 @@
 use sfml::system::Vector2f;
-use std::ops::{AddAssign, Mul};
+use std::ops::{AddAssign, Mul, Add, Sub};
 use std::convert::Into;
 
 #[derive(Clone, Copy, Default)]
@@ -31,6 +31,13 @@ impl Vector {
     pub fn get_y(&self) -> f32 {
         self.vector.y
     }
+
+    pub fn distance(end_point: Point, start_point: Point) -> f32 {
+        let distance_vector = end_point.vector - start_point.vector;
+        let length = f32::sqrt(f32::powi(distance_vector.x, 2) + f32::powi(distance_vector.y, 2));
+    
+        length
+    }
 }
 
 impl AddAssign for Vector {
@@ -47,45 +54,30 @@ impl Mul<f32> for Vector {
     type Output = Self;
 }
 
-#[derive(Clone, Copy, Default)]
-pub struct Point {
-    position: Vector2f,
+impl Add<Vector> for Vector{
+    fn add(self, rhs: Vector) -> Self::Output {
+        Vector::new(self.get_x() + rhs.get_x(), self.get_y() + rhs.get_y())
+    }
+
+    type Output = Self;
 }
 
-impl Point {
-    pub fn new(x: f32, y: f32) -> Self {
-        Self {
-            position: Vector2f::new(x, y),
-        }
+impl Sub for Vector{
+    fn sub(self, rhs: Self) -> Self::Output {
+        let resutl_vector = self.vector - rhs.vector;
+        Vector::new(resutl_vector.x, resutl_vector.y)
     }
 
-    pub fn get_x(&self) -> f32 {
-        self.position.x
-    }
-
-    pub fn get_y(&self) -> f32 {
-        self.position.y
-    }
-    
-    pub fn distance(end_point: Point, start_point: Point) -> f32 {
-        let distance_vector = end_point.position - start_point.position;
-        let length = f32::sqrt(f32::powi(distance_vector.x, 2) + f32::powi(distance_vector.y, 2));
-    
-        length
-    }
+    type Output = Vector;
 }
 
-impl AddAssign<Vector> for Point{
-    fn add_assign(&mut self, rhs: Vector) {
-        self.position.x += rhs.get_x();
-        self.position.y += rhs.get_y();
-    }
-}
 
-impl Into<Vector2f> for Point{
+impl Into<Vector2f> for Vector{
     fn into(self) -> Vector2f {
-        self.position
+        self.vector
     }
 }
 
-pub type Position = Point;
+
+pub type Position = Vector;
+pub type Point = Vector;

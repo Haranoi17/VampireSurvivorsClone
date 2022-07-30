@@ -1,4 +1,4 @@
-use crate::MathUtilities::{Point, Position};
+use crate::MathUtilities::{Point, Position, Vector};
 
 #[derive(Clone, Copy)]
 pub struct Circle {
@@ -67,7 +67,7 @@ impl Collider {
                 first_rectangle,
                 second.position,
                 second_rectangle,
-            )
+            ),
         }
     }
 
@@ -100,9 +100,13 @@ impl Collider {
             return false;
         }
 
-        // let circle_center = circle
-        // let point_on_circle_between_colliders_centers =
-        true
+        let circle_center = circle_position;
+        let rectangle_center = rectangle_position + Vector::new(rectangle.width/2.0, rectangle.height/2.0);
+        let vector_from_circle_center_to_rectangle_center = rectangle_center - circle_center;
+
+        let point_on_circle_between_colliders_centers = circle_position + vector_from_circle_center_to_rectangle_center.normal().unwrap_or_default() * circle_radius;
+
+        Self::is_point_in_rectangle(rectangle_position, rectangle, point_on_circle_between_colliders_centers)
     }
 
     fn rectangle_to_rectangle_collision(
@@ -119,7 +123,20 @@ impl Collider {
         result
     }
 
-    // fn is_point_in_rectangle(rectangle: Rectangle, point: Point) {}
+    fn is_point_in_rectangle(
+        rectangle_position: Position,
+        rectangle: Rectangle,
+        point: Point,
+    ) -> bool {
+        let is_in_x = point.get_x() > rectangle_position.get_x()
+            && point.get_x() < rectangle_position.get_x() + rectangle.width;
+        let is_in_y = point.get_y() > rectangle_position.get_y()
+            && point.get_y() < rectangle_position.get_y() + rectangle.height;
+
+        let result = is_in_x && is_in_y;
+
+        result
+    }
 
     fn outer_rectangle_circle(rectangle: Rectangle) -> Circle {
         Circle::new(f32::sqrt(
@@ -127,3 +144,6 @@ impl Collider {
         ))
     }
 }
+
+
+//TODO write some tests 
