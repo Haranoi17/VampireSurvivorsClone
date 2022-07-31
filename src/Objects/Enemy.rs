@@ -3,18 +3,18 @@ use sfml::system::Vector2f;
 
 use super::Interfaces::{Drawable, Initializable, Updatable};
 use crate::CollisionSystem::{Collidable, Collider, CollisionShape, Rectangle};
-use crate::MathUtilities::Point;
+use crate::MathUtilities::{Position};
 
 pub struct Enemy {
-    position: Point,
+    position: Position,
     rectangle: Rectangle,
 }
 
 impl Enemy {
     pub fn new() -> Self {
         Self {
-            position: Point::new(200.0, 200.0),
-            rectangle: Rectangle::new(40.0, 40.0),
+            position: Position::new(200.0, 200.0),
+            rectangle: Rectangle::new(400.0, 40.0),
         }
     }
 }
