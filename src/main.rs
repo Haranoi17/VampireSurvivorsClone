@@ -2,7 +2,6 @@
 mod Animations;
 
 #[allow(non_snake_case)]
-
 mod CollisionSystem;
 
 #[allow(non_snake_case)]
@@ -10,10 +9,11 @@ mod MathUtilities;
 
 #[allow(non_snake_case)]
 mod Objects;
-use CollisionSystem::{Collider, Collidable};
+use CollisionSystem::{Collidable, Collider};
 use Objects::{
+    Enemy::Enemy,
     Interfaces::{Drawable, Initializable, Updatable},
-    Player::Player, Enemy::Enemy,
+    Player::Player,
 };
 
 use sfml::{
@@ -56,15 +56,14 @@ fn main() {
         player.update(delta_time);
 
         let result = Collider::collide(player.get_collider(), enemy.get_collider());
-        println!("{}",result);
+        if result {
+            player.on_collision();
+        }
 
         window.clear(Color::BLACK);
 
-
         player.draw(&mut window);
         enemy.draw(&mut window);
-
-
 
         window.display();
     }

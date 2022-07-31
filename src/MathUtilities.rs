@@ -15,13 +15,19 @@ impl Vector {
     }
 
     pub fn normal(&self) -> Option<Self> {
-        let length = f32::sqrt(f32::powi(self.vector.x, 2) + f32::powi(self.vector.y, 2));
+        let length = self.length();
 
         if length <= 0.0 {
             return None;
         }
 
         Some(Vector::new(self.vector.x / length, self.vector.y / length))
+    }
+
+    pub fn length(&self)->f32{
+        let length = f32::sqrt(f32::powi(self.vector.x, 2) + f32::powi(self.vector.y, 2));
+
+        length
     }
 
     pub fn get_x(&self) -> f32 {
