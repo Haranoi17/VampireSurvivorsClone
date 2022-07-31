@@ -32,6 +32,11 @@ fn create_window() -> RenderWindow {
     RenderWindow::new(vide_mode, "", Style::DEFAULT, &ContextSettings::default())
 }
 
+
+#[allow(non_snake_case)]
+mod ControllFlow;
+
+
 fn main() {
     let mut player = Player::new();
     let mut enemy = Enemy::new();
