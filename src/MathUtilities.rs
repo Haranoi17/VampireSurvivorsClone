@@ -1,3 +1,5 @@
+mod Tests;
+
 use sfml::system::Vector2f;
 use std::ops::{AddAssign, Mul, Add, Sub};
 use std::convert::Into;

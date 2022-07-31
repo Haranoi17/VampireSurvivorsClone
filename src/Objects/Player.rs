@@ -1,8 +1,7 @@
-use crate::{Animations::AnimationPlayer, CollisionSystem::{Collidable, CollisionShape, Rectangle,  Circle}, MathUtilities::{Vector, Point}};
+use crate::{Animations::AnimationPlayer, CollisionSystem::{Collidable, CollisionShape, Circle}, MathUtilities::{Vector, Point}};
 
 use sfml::{
-    graphics::{RenderTarget, RenderWindow, Transformable, RectangleShape, Shape, CircleShape, Color},
-    system::Vector2f,
+    graphics::{RenderTarget, RenderWindow, Transformable, Shape, CircleShape, Color},
     window::Key,
 };
 

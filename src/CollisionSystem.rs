@@ -1,6 +1,6 @@
-use sfml::graphics::{RenderTarget, CircleShape, Transformable, Shape, Color, RectangleShape};
+mod Tests;
 
-use crate::{MathUtilities::{Point, Position, Vector}, Objects::Interfaces::Drawable};
+use crate::{MathUtilities::{Point, Position, Vector}};
 
 #[derive(Clone, Copy)]
 pub struct Circle {
@@ -36,30 +36,6 @@ pub struct Collider {
     pub shape: CollisionShape,
     pub position: Position,
 }
-
-// impl Drawable for Collider{
-//     fn draw(&mut self, window: &mut sfml::graphics::RenderWindow) {
-//         match self.shape {
-//             CollisionShape::Circle(circle) => {
-//                 let mut circleShape = CircleShape::new(circle.radius, 100);
-//                 circleShape.set_fill_color(Color::TRANSPARENT);
-//                 circleShape.set_outline_color(Color::GREEN);
-//                 circleShape.set_position(self.position);
-
-//                 window.draw(&circleShape);
-//             },
-//             CollisionShape::Rectangle(rectangle) => {
-//                 let mut rectangleShape = RectangleShape::new();
-//                 rectangleShape.set_size(Vector::new(rectangle.width, rectangle.height));
-//                 rectangleShape.set_fill_color(Color::TRANSPARENT);
-//                 rectangleShape.set_outline_color(Color::GREEN);
-//                 rectangleShape.set_position(self.position);
-
-//                 window.draw(&rectangleShape);
-//             },
-//         }
-//     }
-// }
 
 pub trait Collidable {
     fn get_collider(&self) -> Collider;
@@ -164,132 +140,4 @@ impl Collider {
         let radius = f32::sqrt(f32::powi(rectangle.height, 2) + f32::powi(rectangle.width, 2))/2.0;
         Circle::new(radius)
     }
-}
-
-#[test]
-fn rectangle_rectangle_collision_tests() {
-    let size_for_both_colliders = 1.0f32;
-    
-    let first_collider = Collider {
-        position: Vector::default(),
-        shape: CollisionShape::Rectangle(Rectangle::new(
-            size_for_both_colliders,
-            size_for_both_colliders,
-        )),
-    };
-    
-    let mut second_collider = Collider {
-        position: Vector::default(),
-        shape: CollisionShape::Rectangle(Rectangle::new(
-            size_for_both_colliders,
-            size_for_both_colliders,
-        )),
-    };
-
-    assert_eq!(Collider::collide(first_collider, second_collider), true);
-
-    second_collider.position = Vector::new(-0.5, 0.0);
-    assert_eq!(Collider::collide(first_collider, second_collider), true);
-
-    second_collider.position = Vector::new(-0.5, 0.5);
-    assert_eq!(Collider::collide(first_collider, second_collider), true);
-    
-    second_collider.position = Vector::new(-1.0, 0.0);
-    assert_eq!(Collider::collide(first_collider, second_collider), false);
-
-    second_collider.position = Vector::new(-1.0, -1.0);
-    assert_eq!(Collider::collide(first_collider, second_collider), false);
-
-    second_collider.position = Vector::new(-0.99, -0.99);
-    assert_eq!(Collider::collide(first_collider, second_collider), true);
-
-    second_collider.position = Vector::new(0.99, 0.99);
-    assert_eq!(Collider::collide(first_collider, second_collider), true);
-}
-
-
-#[test]
-fn circle_rectangle_collision_tests() {
-    let size_for_both_colliders = 1.0f32;
-    
-    let rectangle_collider = Collider {
-        position: Vector::default(),
-        shape: CollisionShape::Rectangle(Rectangle::new(
-            size_for_both_colliders,
-            size_for_both_colliders,
-        )),
-    };
-    
-    let mut circular_collider = Collider {
-        position: Vector::default(),
-        shape: CollisionShape::Circle(Circle::new(
-            size_for_both_colliders,
-        )),
-    };
-
-    assert_eq!(Collider::collide(rectangle_collider, circular_collider), true);
-
-    circular_collider.position = Vector::new(-0.5, -0.5);
-    assert_eq!(Collider::collide(rectangle_collider, circular_collider), true);
-
-    circular_collider.position = Vector::new(0.5, 0.0);
-    assert_eq!(Collider::collide(rectangle_collider, circular_collider), true);
-    
-    circular_collider.position = Vector::new(0.5, 1.0);
-    assert_eq!(Collider::collide(rectangle_collider, circular_collider), true);
-
-    circular_collider.position = Vector::new(0.5, 0.5);
-    assert_eq!(Collider::collide(rectangle_collider, circular_collider), true);
-
-    circular_collider.position = Vector::new(0.5, -0.99);
-    assert_eq!(Collider::collide(rectangle_collider, circular_collider), true);
-    
-    circular_collider.position = Vector::new(0.5, -2.0);
-    assert_eq!(Collider::collide(rectangle_collider, circular_collider), false);
-
-    //symetric calls
-    circular_collider.position = Vector::new(-0.5, -0.5);
-    assert_eq!(Collider::collide(circular_collider, rectangle_collider), true);
-
-    circular_collider.position = Vector::new(0.5, 0.0);
-    assert_eq!(Collider::collide(circular_collider, rectangle_collider), true);
-    
-    circular_collider.position = Vector::new(0.5, 1.0);
-    assert_eq!(Collider::collide(circular_collider, rectangle_collider), true);
-
-    circular_collider.position = Vector::new(0.5, 0.5);
-    assert_eq!(Collider::collide(circular_collider, rectangle_collider), true);
-
-    circular_collider.position = Vector::new(0.5, -0.99);
-    assert_eq!(Collider::collide(circular_collider, rectangle_collider), true);
-    
-    circular_collider.position = Vector::new(0.5, -2.0);
-    assert_eq!(Collider::collide(circular_collider, rectangle_collider), false);
-
-}
-
-#[test]
-fn circle_to_circle_collision_test(){
-    let radius = 1.0f32;
-    let first_collider = Collider {
-        position: Vector::default(),
-        shape: CollisionShape::Circle(Circle::new(
-            radius,
-        )),
-    };
-
-    let mut second_collider = Collider {
-        position: Vector::default(),
-        shape: CollisionShape::Circle(Circle::new(
-            radius,
-        )),
-    };
-
-    assert_eq!(Collider::collide(first_collider, second_collider), true);
-
-    second_collider.position = Vector::new(2.0, 0.0);
-    assert_eq!(Collider::collide(first_collider, second_collider), false);
-
-    second_collider.position = Vector::new(1.99, 0.0);
-    assert_eq!(Collider::collide(first_collider, second_collider), true);
 }
