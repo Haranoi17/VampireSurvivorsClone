@@ -1,26 +1,25 @@
 mod Tests;
 
-use crate::Objects::Interfaces::Updatable;
+use sfml::graphics::RenderWindow;
 
+use crate::Objects::Interfaces::{Updatable, Drawable};
 
-
-mod Interfaces;
+pub mod Interfaces;
 use self::Interfaces::State;
 
-
 #[derive(PartialEq)]
-enum FlowState{
+pub enum FlowState{
     Enter,
     Update,
     Exit,
 }
 
-struct StateMachine<StatesEnum: Default + State<StatesEnum>> {
+pub struct StateMachine<StatesEnum: Default + State<StatesEnum> + Drawable> {
     current_state: StatesEnum,
     flow_state: FlowState,
 }
 
-impl<StatesEnum: Default + State<StatesEnum>> StateMachine<StatesEnum> {
+impl<StatesEnum: Default + State<StatesEnum> + Drawable> StateMachine<StatesEnum> {
     pub fn new() -> Self {
         Self {
             current_state: StatesEnum::default(),
@@ -29,13 +28,13 @@ impl<StatesEnum: Default + State<StatesEnum>> StateMachine<StatesEnum> {
     }
 }
 
-impl<StatesEnum: Default + State<StatesEnum>> StateMachine<StatesEnum> {
+impl<StatesEnum: Default + State<StatesEnum> + Drawable> StateMachine<StatesEnum> {
     pub fn swich_state(&mut self, state: StatesEnum) {
         self.current_state = state;
     }
 }
 
-impl<StatesEnum: Default + State<StatesEnum>> Updatable for StateMachine<StatesEnum> {
+impl<StatesEnum: Default + State<StatesEnum> + Drawable> Updatable for StateMachine<StatesEnum> {
     fn update(&mut self, delta_time: f32) {
        self.flow_state = match self.flow_state{
             FlowState::Enter => {
@@ -57,5 +56,11 @@ impl<StatesEnum: Default + State<StatesEnum>> Updatable for StateMachine<StatesE
                 }
             },
         }
+    }
+}
+
+impl<StatesEnum: Default + State<StatesEnum> + Drawable> Drawable for StateMachine<StatesEnum>{
+    fn draw(&mut self, window: &mut RenderWindow) {
+        self.current_state.draw(window);
     }
 }
