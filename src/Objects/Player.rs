@@ -1,4 +1,5 @@
-use crate::{Animations::AnimationPlayer, CollisionSystem::{Collidable, CollisionShape, Circle}, MathUtilities::{Vector, Point}};
+use crate::{CollisionSystem::{Collidable, CollisionShape, Circle}, MathUtilities::{Vector, Point}};
+use super::Animations::AnimationPlayer;
 
 use sfml::{
     graphics::{RenderTarget, RenderWindow, Transformable, Shape, CircleShape, Color},
