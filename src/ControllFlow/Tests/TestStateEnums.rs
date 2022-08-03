@@ -1,4 +1,4 @@
-use crate::{ControllFlow::{FlowState, State}, Objects::Interfaces::Drawable};
+use crate::{ControllFlow::{FlowState, State}, Objects::Interfaces::Drawable, InputSystem::{InputConsumer, Input}};
 
 use super::TestInnerStates::{TestState1InnerState, TestState2InnerState};
 
@@ -52,6 +52,12 @@ impl Default for TestStatesEnum {
 
 impl Drawable for TestStatesEnum{
     fn draw(&mut self, window: &mut sfml::graphics::RenderWindow) {
+        
+    }
+}
+
+impl InputConsumer for TestStatesEnum{
+    fn handle_input(&mut self, input: &Input) {
         
     }
 }

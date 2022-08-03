@@ -6,12 +6,13 @@ use sfml::{
 
 mod ProgramControllFlow;
 use ProgramControllFlow::States;
-use crate::{ControllFlow::StateMachine, Objects::Interfaces::{Updatable, Drawable}};
+use crate::{ControllFlow::StateMachine, Objects::Interfaces::{Updatable, Drawable, Initializable}, InputSystem::{Input, InputConsumer}};
 
 pub struct Program {
     window: RenderWindow,
     timer: Clock,
     states: StateMachine<States>,
+    input: Input,
 }
 
 impl Program {
@@ -20,6 +21,7 @@ impl Program {
             window: Self::create_window(),
             timer: Clock::default(),
             states: StateMachine::new(),
+            input: Input::new(),
         }
     }
 
@@ -32,12 +34,16 @@ impl Program {
     }
     
     
-    pub fn initialize(&mut self) {}
+    pub fn initialize(&mut self) {
+        self.input.initialize();
+    }
     
     
     fn update(&mut self){
         let delta_time = self.timer.restart().as_seconds();
+        self.input.update(delta_time);
         self.states.update(delta_time);
+        self.states.handle_input(&self.input);
     }
     
     fn draw(&mut self){

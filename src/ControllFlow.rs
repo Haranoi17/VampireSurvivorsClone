@@ -2,7 +2,7 @@ mod Tests;
 
 use sfml::graphics::RenderWindow;
 
-use crate::Objects::Interfaces::{Updatable, Drawable};
+use crate::{Objects::Interfaces::{Updatable, Drawable}, InputSystem::{InputConsumer, Input}};
 
 pub mod Interfaces;
 use self::Interfaces::State;
@@ -14,12 +14,12 @@ pub enum FlowState{
     Exit,
 }
 
-pub struct StateMachine<StatesEnum: Default + State<StatesEnum> + Drawable> {
+pub struct StateMachine<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> {
     current_state: StatesEnum,
     flow_state: FlowState,
 }
 
-impl<StatesEnum: Default + State<StatesEnum> + Drawable> StateMachine<StatesEnum> {
+impl<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> StateMachine<StatesEnum> {
     pub fn new() -> Self {
         Self {
             current_state: StatesEnum::default(),
@@ -28,13 +28,13 @@ impl<StatesEnum: Default + State<StatesEnum> + Drawable> StateMachine<StatesEnum
     }
 }
 
-impl<StatesEnum: Default + State<StatesEnum> + Drawable> StateMachine<StatesEnum> {
-    pub fn swich_state(&mut self, state: StatesEnum) {
-        self.current_state = state;
-    }
-}
+// impl<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> StateMachine<StatesEnum> {
+//     pub fn swich_state(&mut self, state: StatesEnum) {
+//         self.current_state = state;
+//     }
+// }
 
-impl<StatesEnum: Default + State<StatesEnum> + Drawable> Updatable for StateMachine<StatesEnum> {
+impl<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> Updatable for StateMachine<StatesEnum> {
     fn update(&mut self, delta_time: f32) {
        self.flow_state = match self.flow_state{
             FlowState::Enter => {
@@ -59,8 +59,14 @@ impl<StatesEnum: Default + State<StatesEnum> + Drawable> Updatable for StateMach
     }
 }
 
-impl<StatesEnum: Default + State<StatesEnum> + Drawable> Drawable for StateMachine<StatesEnum>{
+impl<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> Drawable for StateMachine<StatesEnum>{
     fn draw(&mut self, window: &mut RenderWindow) {
         self.current_state.draw(window);
+    }
+}
+
+impl <StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> InputConsumer for StateMachine<StatesEnum>{
+    fn handle_input(&mut self, input: &Input) {
+        self.current_state.handle_input(input);
     }
 }

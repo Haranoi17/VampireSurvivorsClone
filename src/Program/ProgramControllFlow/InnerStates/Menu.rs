@@ -1,6 +1,6 @@
 use sfml::{graphics::{Font, Text, Color, Transformable, RenderTarget}, SfBox, window::Key};
 
-use crate::{Objects::Interfaces::{Updatable, Drawable}, ControllFlow::StateMachine, MathUtilities::Vector};
+use crate::{Objects::Interfaces::{Updatable, Drawable}, ControllFlow::StateMachine, MathUtilities::Vector, InputSystem::{InputConsumer, Keys}};
 
 pub struct MainMenuInnerState {
     font: SfBox<Font>,
@@ -49,7 +49,17 @@ impl MainMenuInnerState {
 
 impl Updatable for MainMenuInnerState{
     fn update(&mut self, delta_time: f32) {
-        self.handle_input();
+    }
+}
+
+impl InputConsumer for MainMenuInnerState{
+    fn handle_input(&mut self, input: &crate::InputSystem::Input) {
+        if input.just_pressed(Keys::Down){
+            self.move_down();
+        }
+        if input.just_pressed(Keys::Up){
+            self.move_up();
+        }
     }
 }
 

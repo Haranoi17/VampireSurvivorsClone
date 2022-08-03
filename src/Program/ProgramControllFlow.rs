@@ -1,6 +1,6 @@
 use sfml::graphics::RenderWindow;
 
-use crate::{ControllFlow::{Interfaces::State, FlowState}, Objects::Interfaces::{Drawable, Updatable}};
+use crate::{ControllFlow::{Interfaces::State, FlowState}, Objects::Interfaces::{Drawable, Updatable}, InputSystem::{InputConsumer, Input}};
 
 use self::InnerStates::{MainIntroInnerState, MainMenuInnerState};
 
@@ -55,6 +55,15 @@ impl Drawable for States{
         match self {
             States::Intro(intro) => intro.draw(window),
             States::Menu(menu) => {menu.draw(window)},
+        }
+    }
+}
+
+impl InputConsumer for States{
+    fn handle_input(&mut self, input: &Input) {
+        match self {
+            States::Intro(intro) => {},
+            States::Menu(menu) => menu.handle_input(input),
         }
     }
 }

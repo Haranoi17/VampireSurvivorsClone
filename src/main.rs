@@ -8,6 +8,9 @@ mod MathUtilities;
 mod Objects;
 
 #[allow(non_snake_case)]
+mod InputSystem;
+
+#[allow(non_snake_case)]
 mod ControllFlow;
 
 #[allow(non_snake_case)]
