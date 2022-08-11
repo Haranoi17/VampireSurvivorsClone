@@ -2,6 +2,8 @@ mod Tests;
 
 use core::panic;
 use sfml::{graphics::Texture, SfBox};
+use std::clone;
+use std::marker::Copy;
 use std::{collections::HashMap, fs};
 
 pub struct Animation {

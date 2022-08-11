@@ -9,5 +9,5 @@ pub trait Drawable {
 }
 
 pub trait Initializable {
-    fn initialize(&mut self);
+    fn initialize(&mut self){}
 }

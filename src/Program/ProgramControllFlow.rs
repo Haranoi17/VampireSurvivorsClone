@@ -2,13 +2,14 @@ use sfml::graphics::RenderWindow;
 
 use crate::{ControllFlow::{Interfaces::State, FlowState}, Objects::Interfaces::{Drawable, Updatable}, InputSystem::{InputConsumer, Input}};
 
-use self::InnerStates::{MainIntroInnerState, MainMenuInnerState};
+use self::InnerStates::{MainIntroInnerState, MainMenuInnerState, GamePlayInnerState};
 
 mod InnerStates;
 
 pub enum States {
     Intro(MainIntroInnerState),
     Menu(MainMenuInnerState),
+    GamePlay(GamePlayInnerState),
 }
 
 impl State<States> for States {
@@ -27,8 +28,13 @@ impl State<States> for States {
             }
             States::Menu(menu) => {
                 menu.update(delta_time);
-                FlowState::Update
+                menu.get_flow_state()
             }
+
+            States::GamePlay(game_play) => {
+                game_play.update(delta_time);
+                FlowState::Update
+            },
         }
     }
 
@@ -37,9 +43,13 @@ impl State<States> for States {
             States::Intro(_) =>{
                 Some(States::Menu(MainMenuInnerState::new()))
             },
-            States::Menu(_) => {
-                Some(States::Intro(MainIntroInnerState::new()))
+            States::Menu(menu) => {
+                let chosen_state = menu.get_chosen_state();
+                menu.reset();
+
+                chosen_state
             }
+            States::GamePlay(game_play) => todo!(),
         }
     }
 }
@@ -54,7 +64,8 @@ impl Drawable for States{
     fn draw(&mut self, window: &mut RenderWindow) {
         match self {
             States::Intro(intro) => intro.draw(window),
-            States::Menu(menu) => {menu.draw(window)},
+            States::Menu(menu) => menu.draw(window),
+            States::GamePlay(game_play) => game_play.draw(window),
         }
     }
 }
@@ -64,6 +75,7 @@ impl InputConsumer for States{
         match self {
             States::Intro(intro) => {},
             States::Menu(menu) => menu.handle_input(input),
+            States::GamePlay(game_play) => game_play.handle_input(input),
         }
     }
 }
