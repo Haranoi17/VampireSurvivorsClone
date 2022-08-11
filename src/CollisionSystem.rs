@@ -1,7 +1,7 @@
 mod Tests;
 pub mod Symulation;
 
-use crate::{MathUtilities::{Point, Position, Vector}, Objects::Interfaces::AToAny};
+use crate::{MathUtilities::{Point, Position, Vector}};
 
 #[derive(Clone, Copy)]
 pub struct Circle {
@@ -56,7 +56,7 @@ pub enum CollisionMask{
     Enemy,
 }
 
-pub trait Collidable: AToAny{
+pub trait Collidable{
     fn get_collider(&self) -> Collider;
     fn get_mask(&self) -> CollisionMask;
     fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask);

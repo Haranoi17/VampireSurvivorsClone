@@ -1,4 +1,4 @@
-use crate::{CollisionSystem::{Collidable, CollisionShape, Circle, CollisionMask, CollisionInfo}, MathUtilities::{Vector, Point, Position}, InputSystem::{InputConsumer, Input, Keys}, Objects::Interfaces::AToAny};
+use crate::{CollisionSystem::{Collidable, CollisionShape, Circle, CollisionMask, CollisionInfo}, MathUtilities::{Vector, Point, Position}, InputSystem::{InputConsumer, Input, Keys}};
 use crate::Objects::Animations::AnimationPlayer;
 
 use sfml::{
