@@ -19,6 +19,8 @@ pub enum Keys{
     Right,
     Up,
     Down,
+    Enter,
+    Esc,
 
     Size,
 }
@@ -83,12 +85,18 @@ impl Initializable for Input{
         let s_supplier = Box::new(|| Key::S.is_pressed());
         let a_supplier = Box::new(|| Key::A.is_pressed());
         let d_supplier = Box::new(|| Key::D.is_pressed());
+        let enter_supplier = Box::new(|| Key::ENTER.is_pressed());
+        let esc_supplier = Box::new(|| Key::ESCAPE.is_pressed());
+
 
 
         self.key_value_sources.insert(Keys::Left as usize, a_supplier);
         self.key_value_sources.insert(Keys::Right as usize, d_supplier);
         self.key_value_sources.insert(Keys::Up as usize, w_supplier);
         self.key_value_sources.insert(Keys::Down as usize, s_supplier);
+        self.key_value_sources.insert(Keys::Enter as usize, enter_supplier);
+        self.key_value_sources.insert(Keys::Esc as usize, esc_supplier);
+
     }
 }
 

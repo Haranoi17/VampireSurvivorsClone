@@ -1,12 +1,12 @@
-use crate::{CollisionSystem::{Collidable, CollisionShape, Circle}, MathUtilities::{Vector, Point}};
-use super::Animations::AnimationPlayer;
+use crate::{CollisionSystem::{Collidable, CollisionShape, Circle, CollisionMask, CollisionInfo}, MathUtilities::{Vector, Point, Position}, InputSystem::{InputConsumer, Input, Keys}, Objects::Interfaces::AToAny};
+use crate::Objects::Animations::AnimationPlayer;
 
 use sfml::{
     graphics::{RenderTarget, RenderWindow, Transformable, Shape, CircleShape, Color},
     window::Key,
 };
 
-use super::Interfaces::{Drawable, Initializable, Updatable};
+use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
 use crate::CollisionSystem::Collider;
 
 pub struct Player {
@@ -56,26 +56,22 @@ impl Player {
     //     visual_representation
     // }
 
-    fn handle_input(&mut self) {
-        self.handle_movement();
-    }
-
-    fn handle_movement(&mut self) {
+    fn handle_movement(&mut self, input: &Input) {
         self.move_direction = Vector::new(0.0, 0.0);
 
-        if Key::W.is_pressed() {
+        if input.is_pressed(Keys::Up) {
             self.move_direction += Vector::new(0.0, -1.0);
         }
 
-        if Key::S.is_pressed() {
+        if input.is_pressed(Keys::Down) {
             self.move_direction += Vector::new(0.0, 1.0);
         }
 
-        if Key::A.is_pressed() {
+        if input.is_pressed(Keys::Left) {
             self.move_direction += Vector::new(-1.0, 0.0);
         }
 
-        if Key::D.is_pressed() {
+        if input.is_pressed(Keys::Right) {
             self.move_direction += Vector::new(1.0, 0.0);
         }
 
@@ -90,13 +86,15 @@ impl Player {
         self.color = Color::GREEN;
     }
 
+    pub fn get_position(&self)->Position{
+        self.position
+    }
 }
 
 impl Updatable for Player {
     fn update(&mut self, delta_time: f32) {
         self.animation_player.update(delta_time);
 
-        self.handle_input();
         self.update_position(delta_time);
 
         self.color = Color::RED;
@@ -119,6 +117,26 @@ impl Initializable for Player {
 
 impl Collidable for Player{
     fn get_collider(&self)-> Collider {
-        Collider { shape: self.collision_shape, position: self.position }
+        Collider { shape: self.collision_shape, position: self.position,  }
+    }
+
+    fn get_mask(&self) -> CollisionMask {
+        CollisionMask::Player
+    }
+
+    fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask) {
+        match other_mask {
+            CollisionMask::Player => {},
+            CollisionMask::Enemy => {
+                println!("Player collided with enemy");
+                // self.position += info.collision_direction
+            },
+        }
+    }
+}
+
+impl InputConsumer for Player{
+    fn handle_input(&mut self, input: &crate::InputSystem::Input) {
+        self.handle_movement(input);
     }
 }

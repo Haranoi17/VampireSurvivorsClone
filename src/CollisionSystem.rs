@@ -1,6 +1,7 @@
 mod Tests;
+pub mod Symulation;
 
-use crate::{MathUtilities::{Point, Position, Vector}};
+use crate::{MathUtilities::{Point, Position, Vector}, Objects::Interfaces::AToAny};
 
 #[derive(Clone, Copy)]
 pub struct Circle {
@@ -32,13 +33,33 @@ pub enum CollisionShape {
 }
 
 #[derive(Clone, Copy)]
+pub struct CollisionInfo{
+    pub collision_direction: Vector,
+    pub collision_depth: Vector,   
+}
+
+impl CollisionInfo{
+    pub fn new(collision_direction: Vector, collision_depth: Vector)->Self{
+        Self { collision_direction, collision_depth }
+    }
+}
+
+#[derive(Clone, Copy)]
 pub struct Collider {
     pub shape: CollisionShape,
     pub position: Position,
 }
 
-pub trait Collidable {
+#[derive(Clone, Copy)]
+pub enum CollisionMask{
+    Player,
+    Enemy,
+}
+
+pub trait Collidable: AToAny{
     fn get_collider(&self) -> Collider;
+    fn get_mask(&self) -> CollisionMask;
+    fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask);
 }
 
 impl Collider {
@@ -136,7 +157,7 @@ impl Collider {
         result
     }
 
-    fn outer_rectangle_circle(rectangle: Rectangle) -> Circle {
+    pub fn outer_rectangle_circle(rectangle: Rectangle) -> Circle {
         let radius = f32::sqrt(f32::powi(rectangle.height, 2) + f32::powi(rectangle.width, 2))/2.0;
         Circle::new(radius)
     }

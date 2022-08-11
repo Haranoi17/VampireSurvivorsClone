@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use sfml::graphics::RenderWindow;
 
 pub trait Updatable {
@@ -9,5 +11,15 @@ pub trait Drawable {
 }
 
 pub trait Initializable {
-    fn initialize(&mut self);
+    fn initialize(&mut self){}
+}
+
+pub trait AToAny: 'static {
+    fn as_any(&self) -> &dyn Any;
+}
+
+impl<T: 'static> AToAny for T {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
 }
