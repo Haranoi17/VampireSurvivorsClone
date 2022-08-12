@@ -28,12 +28,6 @@ impl<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> StateMa
     }
 }
 
-// impl<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> StateMachine<StatesEnum> {
-//     pub fn swich_state(&mut self, state: StatesEnum) {
-//         self.current_state = state;
-//     }
-// }
-
 impl<StatesEnum: Default + State<StatesEnum> + Drawable + InputConsumer> Updatable for StateMachine<StatesEnum> {
     fn update(&mut self, delta_time: f32) {
        self.flow_state = match self.flow_state{
