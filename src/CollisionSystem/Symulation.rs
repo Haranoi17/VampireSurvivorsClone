@@ -1,17 +1,18 @@
-use std::{vec, };
+use std::vec;
 
 use crate::MathUtilities::{Position, Vector};
 
-use super::{Circle, Collidable, Collider, CollisionInfo, CollisionShape, CollisionMask};
-
+use super::{
+    Circle, Collidable, Collider, CollisionInfo, CollisionMask, CollisionShape, Rectangle,
+};
 
 #[derive(Debug)]
-pub struct Pair<T>{
+pub struct Pair<T> {
     pub first: T,
     pub second: T,
 }
 
-pub struct CollisionInfoWithMasks{
+pub struct CollisionInfoWithMasks {
     pub info: CollisionInfo,
     pub masks: Pair<CollisionMask>,
 }
@@ -22,10 +23,13 @@ pub struct WordSymulation {
 }
 
 impl WordSymulation {
-    pub fn new()->Self{
-        Self { collided_pairs_indices: vec![], collision_info: vec![] }
+    pub fn new() -> Self {
+        Self {
+            collided_pairs_indices: vec![],
+            collision_info: vec![],
+        }
     }
-    
+
     pub fn collision_detection(&mut self, collidables: &Vec<&mut dyn Collidable>) {
         for i in 0..collidables.len() - 1 {
             for j in i + 1..collidables.len() {
@@ -33,35 +37,55 @@ impl WordSymulation {
                 let second = collidables.get(j).unwrap();
                 let did_collide = Collider::collide(first.get_collider(), second.get_collider());
 
-                if did_collide{
-                    self.collided_pairs_indices.push(Pair{first: i, second: j});
+                if did_collide {
+                    self.collided_pairs_indices.push(Pair {
+                        first: i,
+                        second: j,
+                    });
                 }
             }
         }
     }
-    
-    pub fn gather_collision_info(&mut self, collidables: &Vec<&mut dyn Collidable>){
-        for collision_pair in &mut self.collided_pairs_indices{
+
+    pub fn gather_collision_info(&mut self, collidables: &Vec<&mut dyn Collidable>) {
+        for collision_pair in &mut self.collided_pairs_indices {
             let first = collidables.get(collision_pair.first).unwrap();
             let second = collidables.get(collision_pair.second).unwrap();
-            
-            let new_info = WordSymulation::generate_collision_info(first.get_collider(), second.get_collider());
-            let info_with_masks = CollisionInfoWithMasks{info: new_info, masks: Pair{first: first.get_mask(), second: second.get_mask()}};
-            self.collision_info.push(info_with_masks); 
+
+            let new_info = WordSymulation::generate_collision_info(
+                first.get_collider(),
+                second.get_collider(),
+            );
+            let info_with_masks = CollisionInfoWithMasks {
+                info: new_info,
+                masks: Pair {
+                    first: first.get_mask(),
+                    second: second.get_mask(),
+                },
+            };
+            self.collision_info.push(info_with_masks);
         }
     }
 
-    pub fn clear_collisions(&mut self){
+    pub fn clear_collisions(&mut self) {
         self.collided_pairs_indices.clear();
         self.collision_info.clear();
     }
 
-    pub fn react_to_collisionss(&mut self, collidables: &mut Vec<&mut dyn Collidable>){
-        WordSymulation::react_to_collisions(collidables, &self.collided_pairs_indices, &self.collision_info);
+    pub fn react_to_collisionss(&mut self, collidables: &mut Vec<&mut dyn Collidable>) {
+        WordSymulation::react_to_collisions(
+            collidables,
+            &self.collided_pairs_indices,
+            &self.collision_info,
+        );
     }
 
-    fn react_to_collisions(collidables: &mut Vec<&mut dyn Collidable>, collided_pairs: &Vec<Pair<usize>>, collision_info_with_masks: &Vec<CollisionInfoWithMasks> ){
-        for index in 0..collided_pairs.len(){
+    fn react_to_collisions(
+        collidables: &mut Vec<&mut dyn Collidable>,
+        collided_pairs: &Vec<Pair<usize>>,
+        collision_info_with_masks: &Vec<CollisionInfoWithMasks>,
+    ) {
+        for index in 0..collided_pairs.len() {
             let collision_pair = collided_pairs.get(index).unwrap();
             let first = collidables.get_mut(collision_pair.first).unwrap();
 
@@ -70,7 +94,7 @@ impl WordSymulation {
             first.react_to_collision(collision_info, masks.second);
         }
 
-        for index in 0..collided_pairs.len(){
+        for index in 0..collided_pairs.len() {
             let collision_pair = collided_pairs.get(index).unwrap();
             let second = collidables.get_mut(collision_pair.second).unwrap();
 
@@ -148,6 +172,15 @@ impl WordSymulation {
         let collision_depth_value = sum_of_radii - distance;
         let collision_depth = collision_direction * collision_depth_value;
 
+        CollisionInfo::new(collision_direction, collision_depth)
+    }
+
+    fn circle_to_rectangle_collision(
+        circle: Circle,
+        rectangle: Rectangle,
+        circle_position: Position,
+        rectangle_position: Position,
+    ) -> CollisionInfo {
         CollisionInfo::new(collision_direction, collision_depth)
     }
 }

@@ -1,7 +1,7 @@
-mod Tests;
 pub mod Symulation;
+mod Tests;
 
-use crate::{MathUtilities::{Point, Position, Vector}};
+use crate::MathUtilities::{Point, Position, Vector};
 
 #[derive(Clone, Copy)]
 pub struct Circle {
@@ -33,18 +33,19 @@ pub enum CollisionShape {
 }
 
 #[derive(Clone, Copy)]
-pub struct CollisionInfo{
-    pub collision_direction: Vector,
+pub struct CollisionInfo {
     pub collision_depth: Vector,
 }
 
-impl CollisionInfo{
-    pub fn new(collision_direction: Vector, collision_depth: Vector)->Self{
-        Self { collision_direction, collision_depth }
+impl CollisionInfo {
+    pub fn new(collision_depth: Vector) -> Self {
+        Self { collision_depth }
     }
 
-    pub fn symetrical(&self)->Self{
-        Self { collision_direction: -self.collision_direction, collision_depth: -self.collision_depth }
+    pub fn symetrical(&self) -> Self {
+        Self {
+            collision_depth: -self.collision_depth,
+        }
     }
 }
 
@@ -55,19 +56,19 @@ pub struct Collider {
 }
 
 #[derive(Clone, Copy)]
-pub enum CollisionMask{
+pub enum CollisionMask {
     Player,
     Enemy,
 }
 
-pub trait Collidable{
+pub trait Collidable {
     fn get_collider(&self) -> Collider;
     fn get_mask(&self) -> CollisionMask;
     fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask);
 }
 
 impl Collider {
-    pub fn collide(first: Self, second: Self) -> bool {
+    pub fn collide(first: Self, second: Self) -> Option<CollisionInfo> {
         match (first.shape, second.shape) {
             (CollisionShape::Circle(first_circle), CollisionShape::Circle(second_circle)) => {
                 Self::circle_to_circle_collision(
@@ -110,8 +111,22 @@ impl Collider {
         first_radius: f32,
         second_position: Position,
         second_radius: f32,
-    ) -> bool {
-        Point::distance(first_position, second_position) < first_radius + second_radius
+    ) -> Option<CollisionInfo> {
+        let distance_between_circles = Point::distance(first_position, second_position);
+        let sum_of_radii = first_radius + second_radius;
+
+        let are_colliding = distance_between_circles < sum_of_radii;
+
+        if !are_colliding {
+            return None;
+        }
+
+        let direction = (second_position - first_position)
+            .normal()
+            .unwrap_or_default();
+        let depth = (second_position - first_position).length();
+
+        Some(CollisionInfo::new(direction * depth))
     }
 
     fn circle_to_rectangle_collision(
@@ -119,19 +134,39 @@ impl Collider {
         circle_radius: f32,
         rectangle_position: Position,
         rectangle: Rectangle,
-    ) -> bool {
-        let rectangle_offset_position = rectangle_position - Vector::new(rectangle.width, rectangle.height) * 0.5;
-        
-        let nearest_x = f32::max(rectangle_offset_position.get_x(), f32::min(circle_position.get_x(), rectangle_offset_position.get_x()+rectangle.width));
-        let nearest_y = f32::max(rectangle_offset_position.get_y(), f32::min(circle_position.get_y(), rectangle_offset_position.get_y()+rectangle.height));
+    ) -> Option<CollisionInfo> {
+        let rectangle_offset_position =
+            rectangle_position - Vector::new(rectangle.width, rectangle.height) * 0.5;
+
+        let nearest_x = f32::max(
+            rectangle_offset_position.get_x(),
+            f32::min(
+                circle_position.get_x(),
+                rectangle_offset_position.get_x() + rectangle.width,
+            ),
+        );
+        let nearest_y = f32::max(
+            rectangle_offset_position.get_y(),
+            f32::min(
+                circle_position.get_y(),
+                rectangle_offset_position.get_y() + rectangle.height,
+            ),
+        );
 
         let nearest_on_rectangle = Vector::new(nearest_x, nearest_y);
 
         let difference = nearest_on_rectangle - circle_position;
 
-        let result = difference.length() < circle_radius;
+        let are_colliding = difference.length() < circle_radius;
 
-        return result;
+        if !are_colliding{
+            return None
+        }
+
+        let direction = (nearest_on_rectangle - circle_position).normal().unwrap_or_default();
+        let point_on_circle = circle_position + direction * circle_radius;
+
+        Some(CollisionInfo::new((nearest_on_rectangle - point_on_circle)))
     }
 
     fn rectangle_to_rectangle_collision(
@@ -139,16 +174,22 @@ impl Collider {
         first: Rectangle,
         second_position: Position,
         second: Rectangle,
-    ) -> bool {
+    ) -> Option<CollisionInfo> {
         let first_offset_position = first_position - Vector::new(first.width, first.height) * 0.5;
-        let second_offset_position = second_position - Vector::new(second.width, second.height) * 0.5;
-        
-        let result = first_offset_position.get_x() < second_offset_position.get_x() + second.width
+        let second_offset_position =
+            second_position - Vector::new(second.width, second.height) * 0.5;
+
+        let are_colliding = first_offset_position.get_x() < second_offset_position.get_x() + second.width
             && first_offset_position.get_x() + first.width > second_offset_position.get_x()
             && first_offset_position.get_y() < second_offset_position.get_y() + second.height
             && first_offset_position.get_y() + first.height > second_offset_position.get_y();
 
-        result
+        // if !are_colliding{
+        //     return None
+        // }
+
+        // let 
+        return None
     }
 
     fn is_point_in_rectangle(
@@ -156,7 +197,8 @@ impl Collider {
         rectangle: Rectangle,
         point: Point,
     ) -> bool {
-        let rectangle_offset_position = rectangle_position - Vector::new(rectangle.width, rectangle.height) * 0.5;
+        let rectangle_offset_position =
+            rectangle_position - Vector::new(rectangle.width, rectangle.height) * 0.5;
 
         let is_in_x = point.get_x() > rectangle_offset_position.get_x()
             && point.get_x() < rectangle_offset_position.get_x() + rectangle.width;
@@ -169,7 +211,8 @@ impl Collider {
     }
 
     pub fn outer_rectangle_circle(rectangle: Rectangle) -> Circle {
-        let radius = f32::sqrt(f32::powi(rectangle.height, 2) + f32::powi(rectangle.width, 2))/2.0;
+        let radius =
+            f32::sqrt(f32::powi(rectangle.height, 2) + f32::powi(rectangle.width, 2)) / 2.0;
         Circle::new(radius)
     }
 }
