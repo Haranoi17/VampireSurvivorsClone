@@ -12,11 +12,11 @@ pub struct Enemy {
 }
 
 impl Enemy {
-    pub fn new() -> Self {
+    pub fn new(position: Position) -> Self {
         Self {
-            position: Position::new(200.0, 200.0),
+            position: position,
             rectangle: Rectangle::new(40.0, 40.0),
-            speed: 5.0,
+            speed: 20.0,
         }
     }
 
@@ -26,6 +26,10 @@ impl Enemy {
             Some(direction) => self.position += direction * self.speed * delta_time,
             None => {},
         };
+    }
+
+    fn prevent_walking_on_other_objects(&mut self, info: CollisionInfo){
+        self.position = self.position - info.collision_depth;
     }
 }
 
@@ -57,10 +61,11 @@ impl Collidable for Enemy {
     fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask) {
         match other_mask {
             CollisionMask::Player => {
-                println!("Enemy collided with player");
+                self.prevent_walking_on_other_objects(info);
             },
             CollisionMask::Enemy => {
-                // self.position += info.collision_direction
+                self.prevent_walking_on_other_objects(info);
+                
             },
         }
     }

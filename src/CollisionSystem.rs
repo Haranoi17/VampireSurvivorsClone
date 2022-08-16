@@ -35,12 +35,16 @@ pub enum CollisionShape {
 #[derive(Clone, Copy)]
 pub struct CollisionInfo{
     pub collision_direction: Vector,
-    pub collision_depth: Vector,   
+    pub collision_depth: Vector,
 }
 
 impl CollisionInfo{
     pub fn new(collision_direction: Vector, collision_depth: Vector)->Self{
         Self { collision_direction, collision_depth }
+    }
+
+    pub fn symetrical(&self)->Self{
+        Self { collision_direction: -self.collision_direction, collision_depth: -self.collision_depth }
     }
 }
 

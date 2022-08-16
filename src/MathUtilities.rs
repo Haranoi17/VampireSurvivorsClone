@@ -2,7 +2,7 @@ mod Tests;
 
 use sfml::system::{Vector2f, Vector2u};
 use std::convert::Into;
-use std::ops::{Add, AddAssign, Mul, Sub};
+use std::ops::{Add, AddAssign, Mul, Sub, Neg};
 
 #[derive(Clone, Copy, Default)]
 pub struct Vector {
@@ -91,11 +91,20 @@ impl Sub for Vector {
     type Output = Vector;
 }
 
+impl Neg for Vector{
+    fn neg(self) -> Self::Output {
+        Vector::new(-self.get_x(), -self.get_y())
+    }
+
+    type Output = Vector;
+}
+
 impl Into<Vector2f> for Vector {
     fn into(self) -> Vector2f {
         self.vector
     }
 }
+
 
 pub type Position = Vector;
 pub type Point = Vector;

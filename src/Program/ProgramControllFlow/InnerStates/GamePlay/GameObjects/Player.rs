@@ -89,6 +89,10 @@ impl Player {
     pub fn get_position(&self)->Position{
         self.position
     }
+
+    fn prevent_walking_on_other_objects(&mut self, info: CollisionInfo){
+        self.position = self.position - info.collision_depth;
+    }
 }
 
 impl Updatable for Player {
@@ -126,10 +130,11 @@ impl Collidable for Player{
 
     fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask) {
         match other_mask {
-            CollisionMask::Player => {},
+            CollisionMask::Player => {
+                self.prevent_walking_on_other_objects(info);
+            },
             CollisionMask::Enemy => {
-                println!("Player collided with enemy");
-                // self.position += info.collision_direction
+                self.prevent_walking_on_other_objects(info);
             },
         }
     }

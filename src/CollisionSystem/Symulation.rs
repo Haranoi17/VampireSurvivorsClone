@@ -76,7 +76,8 @@ impl WordSymulation {
 
             let collision_info = collision_info_with_masks.get(index).unwrap().info;
             let masks = &collision_info_with_masks.get(index).unwrap().masks;
-            second.react_to_collision(collision_info, masks.first);
+            let symetrical_collision_info = collision_info.symetrical();
+            second.react_to_collision(symetrical_collision_info, masks.first);
         }
     }
 
@@ -142,7 +143,7 @@ impl WordSymulation {
         let distance = vector_between_positions.length();
         let sum_of_radii = first.radius + second.radius;
 
-        let collision_direction = vector_between_positions.normal().unwrap_or(Vector::new(10.0, 0.0));
+        let collision_direction = vector_between_positions.normal().unwrap_or_default();
 
         let collision_depth_value = sum_of_radii - distance;
         let collision_depth = collision_direction * collision_depth_value;
