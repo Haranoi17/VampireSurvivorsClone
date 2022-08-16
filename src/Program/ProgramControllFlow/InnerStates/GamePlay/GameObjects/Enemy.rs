@@ -3,7 +3,7 @@ use sfml::system::Vector2f;
 
 use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
 use crate::CollisionSystem::{Collidable, Collider, CollisionShape, Rectangle, CollisionMask, CollisionInfo};
-use crate::MathUtilities::{Position};
+use crate::MathUtilities::{Position, Vector};
 
 pub struct Enemy {
     position: Position,
@@ -40,8 +40,10 @@ impl Updatable for Enemy {
 impl Drawable for Enemy {
     fn draw(&mut self, window: &mut sfml::graphics::RenderWindow) {
         let mut rect = RectangleShape::new();
-        rect.set_size(Vector2f::new(self.rectangle.width, self.rectangle.height));
+        let size = Vector::new(self.rectangle.width, self.rectangle.height);
+        rect.set_size(size);
         rect.set_position(self.position);
+        rect.set_origin(size*0.5);
         window.draw(&rect);
     }
 }

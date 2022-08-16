@@ -120,8 +120,10 @@ impl Collider {
         rectangle_position: Position,
         rectangle: Rectangle,
     ) -> bool {
-        let nearest_x = f32::max(rectangle_position.get_x(), f32::min(circle_position.get_x(), rectangle_position.get_x()+rectangle.width));
-        let nearest_y = f32::max(rectangle_position.get_y(), f32::min(circle_position.get_y(), rectangle_position.get_y()+rectangle.height));
+        let rectangle_offset_position = rectangle_position - Vector::new(rectangle.width, rectangle.height) * 0.5;
+        
+        let nearest_x = f32::max(rectangle_offset_position.get_x(), f32::min(circle_position.get_x(), rectangle_offset_position.get_x()+rectangle.width));
+        let nearest_y = f32::max(rectangle_offset_position.get_y(), f32::min(circle_position.get_y(), rectangle_offset_position.get_y()+rectangle.height));
 
         let nearest_on_rectangle = Vector::new(nearest_x, nearest_y);
 
@@ -138,10 +140,13 @@ impl Collider {
         second_position: Position,
         second: Rectangle,
     ) -> bool {
-        let result = first_position.get_x() < second_position.get_x() + second.width
-            && first_position.get_x() + first.width > second_position.get_x()
-            && first_position.get_y() < second_position.get_y() + second.height
-            && first_position.get_y() + first.height > second_position.get_y();
+        let first_offset_position = first_position - Vector::new(first.width, first.height) * 0.5;
+        let second_offset_position = second_position - Vector::new(second.width, second.height) * 0.5;
+        
+        let result = first_offset_position.get_x() < second_offset_position.get_x() + second.width
+            && first_offset_position.get_x() + first.width > second_offset_position.get_x()
+            && first_offset_position.get_y() < second_offset_position.get_y() + second.height
+            && first_offset_position.get_y() + first.height > second_offset_position.get_y();
 
         result
     }
@@ -151,10 +156,12 @@ impl Collider {
         rectangle: Rectangle,
         point: Point,
     ) -> bool {
-        let is_in_x = point.get_x() > rectangle_position.get_x()
-            && point.get_x() < rectangle_position.get_x() + rectangle.width;
-        let is_in_y = point.get_y() > rectangle_position.get_y()
-            && point.get_y() < rectangle_position.get_y() + rectangle.height;
+        let rectangle_offset_position = rectangle_position - Vector::new(rectangle.width, rectangle.height) * 0.5;
+
+        let is_in_x = point.get_x() > rectangle_offset_position.get_x()
+            && point.get_x() < rectangle_offset_position.get_x() + rectangle.width;
+        let is_in_y = point.get_y() > rectangle_offset_position.get_y()
+            && point.get_y() < rectangle_offset_position.get_y() + rectangle.height;
 
         let result = is_in_x && is_in_y;
 
