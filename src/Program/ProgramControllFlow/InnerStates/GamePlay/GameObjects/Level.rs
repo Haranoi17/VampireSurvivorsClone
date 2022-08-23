@@ -95,8 +95,6 @@ impl Level {
 
         self.collision_symulation.collision_detection(&collidables);
         self.collision_symulation
-            .gather_collision_info(&collidables);
-        self.collision_symulation
             .react_to_collisionss(&mut collidables);
         self.collision_symulation.clear_collisions();
         collidables.clear();

@@ -184,11 +184,10 @@ impl Collider {
             && first_offset_position.get_y() < second_offset_position.get_y() + second.height
             && first_offset_position.get_y() + first.height > second_offset_position.get_y();
 
-        // if !are_colliding{
-        //     return None
-        // }
-
-        // let 
+        if !are_colliding{
+            return None
+        }
+         
         return None
     }
 
