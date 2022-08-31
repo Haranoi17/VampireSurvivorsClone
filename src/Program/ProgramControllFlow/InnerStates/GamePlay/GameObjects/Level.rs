@@ -47,7 +47,7 @@ impl Updatable for EnemySpawner {
 pub struct Level {
     player: Player,
     enemies: Vec<Enemy>,
-
+    
     collision_symulation: WordSymulation,
     enemy_spawner: EnemySpawner,
 }
@@ -56,10 +56,10 @@ impl Level {
     pub fn new() -> Self {
         let mut new_level = Self {
             player: Player::new(),
-            enemies: vec![],
+            enemies: vec![Enemy::new(Position::new(900.0, 500.0)),Enemy::new(Position::new(500.0, 500.0))],
             collision_symulation: WordSymulation::new(),
             enemy_spawner: EnemySpawner {
-                timer: BasicTimer::new(2.0),
+                timer: BasicTimer::new(10000.0),
             },
         };
         new_level.initialize();

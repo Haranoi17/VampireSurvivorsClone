@@ -1,6 +1,8 @@
 pub mod Symulation;
 mod Tests;
 
+use std::vec;
+
 use crate::MathUtilities::{Point, Position, Vector};
 
 #[derive(Clone, Copy)]
@@ -188,7 +190,24 @@ impl Collider {
             return None
         }
          
-        return None
+        let vector_between_centers = second_offset_position - first_offset_position;
+        let normal = vector_between_centers.normal().unwrap_or_default();
+
+        let first_support_point = first_position + Vector::new(normal.get_x().signum() * (first.width / 2.0), normal.get_y().signum() * (first.height/2.0));
+        let second_support_point = second_position + Vector::new(-normal.get_x().signum() * (second.width / 2.0), -normal.get_y().signum() * (second.height/2.0));
+
+        let mut depth_vector = first_support_point - second_support_point;
+        
+        if depth_vector.get_x().abs() > depth_vector.get_y().abs(){
+            depth_vector = Vector::new(0.0, depth_vector.get_y());
+        }
+        else{
+            depth_vector = Vector::new(depth_vector.get_x(), 0.0);
+        }
+
+        let depth = depth_vector * 0.5;
+
+        Some(CollisionInfo::new(depth))
     }
 
     fn is_point_in_rectangle(
