@@ -5,6 +5,8 @@ use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
 use crate::CollisionSystem::{Collidable, Collider, CollisionShape, Rectangle, CollisionMask, CollisionInfo};
 use crate::MathUtilities::{Position, Vector};
 
+pub mod Spawner;
+
 pub struct Enemy {
     position: Position,
     rectangle: Rectangle,
@@ -15,7 +17,7 @@ impl Enemy {
     pub fn new(position: Position) -> Self {
         Self {
             position: position,
-            rectangle: Rectangle::new(200.0, 200.0),
+            rectangle: Rectangle::new(40.0, 40.0),
             speed: 20.0,
         }
     }

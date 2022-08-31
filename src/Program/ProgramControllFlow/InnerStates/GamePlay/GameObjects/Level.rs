@@ -12,55 +12,49 @@ use crate::{
     },
 };
 
-use super::{Enemy::Enemy, Player::Player};
+use super::{
+    Enemy::{Enemy, Spawner::Spawner},
+    Player::Player,
+};
 
-struct EnemySpawner {
-    timer: BasicTimer,
+use serde::{Deserialize, Serialize};
+
+
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct LevelConfiguration {
+    pub name: String,
+    pub waves: Vec<Wave>
 }
 
-impl EnemySpawner {
-    pub fn new(spawn_interval: f32) -> Self {
-        Self {
-            timer: BasicTimer::new(spawn_interval),
-        }
-    }
-
-    pub fn start_spawning(&mut self) {
-        self.timer.start();
-    }
-
-    pub fn spawn(&mut self) -> Vec<Enemy> {
-        vec![Enemy::new(Position::new(20.0, 20.0))]
-    }
-
-    fn should_spawn(&self) -> bool {
-        self.timer.isFinished()
-    }
-}
-
-impl Updatable for EnemySpawner {
-    fn update(&mut self, delta_time: f32) {
-        self.timer.update(delta_time);
-    }
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct Wave{
+    pub enemy_count: usize,
+    pub enemy_spawn_delay_in_seconds: usize,
 }
 
 pub struct Level {
     player: Player,
     enemies: Vec<Enemy>,
-    
+
     collision_symulation: WordSymulation,
-    enemy_spawner: EnemySpawner,
+    enemy_spawner: Spawner,
+    
+    configuration: LevelConfiguration,
+    current_wave: Wave,
 }
 
 impl Level {
-    pub fn new() -> Self {
+    pub fn new(level_configuration: LevelConfiguration)->Self{
         let mut new_level = Self {
             player: Player::new(),
-            enemies: vec![Enemy::new(Position::new(900.0, 500.0)),Enemy::new(Position::new(500.0, 500.0))],
+            enemies: vec![],
             collision_symulation: WordSymulation::new(),
-            enemy_spawner: EnemySpawner {
-                timer: BasicTimer::new(10000.0),
-            },
+            enemy_spawner: Spawner::new(0.0),
+            configuration: level_configuration,
+            current_wave: level_configuration.waves.clone().get(0).unwrap().to_owned(),
         };
         new_level.initialize();
         new_level
@@ -80,7 +74,7 @@ impl Level {
     fn update_enemy_spawner(&mut self, delta_time: f32) {
         self.enemy_spawner.update(delta_time);
         if self.enemy_spawner.should_spawn() {
-            self.enemies.extend( self.enemy_spawner.spawn() );
+            self.enemies.extend(self.enemy_spawner.spawn());
             self.enemy_spawner.start_spawning();
         }
     }
@@ -136,6 +130,7 @@ impl InputConsumer for Level {
 impl Initializable for Level {
     fn initialize(&mut self) {
         self.player.initialize();
+
         self.enemy_spawner.start_spawning();
     }
 }

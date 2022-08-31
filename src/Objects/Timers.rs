@@ -47,7 +47,7 @@ impl Timer for BasicTimer{
 
 impl Updatable for BasicTimer{
     fn update(&mut self, delta_time: f32) {
-        if self.isFinished() || !self.isActive(){
+        if self.isFinished() || !self.isActive() || self.duration == 0.0{
             return
         }
 
