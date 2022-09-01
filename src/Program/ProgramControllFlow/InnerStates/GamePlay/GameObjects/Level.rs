@@ -13,7 +13,7 @@ use crate::{
 };
 
 use super::{
-    Enemy::{Enemy, Spawner::Spawner},
+    Enemy::{Enemy, Spawner::{Spawner, WaveSpawner}},
     Player::Player,
 };
 
@@ -32,7 +32,7 @@ pub struct LevelConfiguration {
 #[serde(rename_all = "snake_case")]
 pub struct Wave{
     pub enemy_count: usize,
-    pub enemy_spawn_delay_in_seconds: usize,
+    pub enemy_spawn_delay_in_seconds: f32,
 }
 
 pub struct Level {
@@ -40,10 +40,10 @@ pub struct Level {
     enemies: Vec<Enemy>,
 
     collision_symulation: WordSymulation,
-    enemy_spawner: Spawner,
+    wave_spawner: WaveSpawner,
     
     configuration: LevelConfiguration,
-    current_wave: Wave,
+    current_wave: usize,
 }
 
 impl Level {
@@ -52,9 +52,9 @@ impl Level {
             player: Player::new(),
             enemies: vec![],
             collision_symulation: WordSymulation::new(),
-            enemy_spawner: Spawner::new(0.0),
+            wave_spawner: WaveSpawner::new(level_configuration.waves.get(0).unwrap().clone()),
             configuration: level_configuration,
-            current_wave: level_configuration.waves.clone().get(0).unwrap().to_owned(),
+            current_wave: 0
         };
         new_level.initialize();
         new_level
@@ -71,11 +71,25 @@ impl Level {
         }
     }
 
-    fn update_enemy_spawner(&mut self, delta_time: f32) {
-        self.enemy_spawner.update(delta_time);
-        if self.enemy_spawner.should_spawn() {
-            self.enemies.extend(self.enemy_spawner.spawn());
-            self.enemy_spawner.start_spawning();
+    fn update_wave_spawner(&mut self, delta_time: f32) {
+        if self.wave_spawner.finished_spawning(){
+            self.current_wave += 1usize;
+
+            let new_wave = self.configuration.waves.get(self.current_wave);
+            match new_wave {
+                Some(wave) =>{ 
+                    self.wave_spawner = WaveSpawner::new(wave.clone());
+                    self.wave_spawner.start_spawning();
+                }
+                
+                None => self.wave_spawner.stop_spawning(),
+            }          
+        }
+
+        self.wave_spawner.update(delta_time);
+        if self.wave_spawner.should_spawn() {
+            self.enemies.extend(self.wave_spawner.spawn());
+            self.wave_spawner.start_spawning();
         }
     }
 
@@ -108,9 +122,9 @@ impl Level {
 impl Updatable for Level {
     fn update(&mut self, delta_time: f32) {
         self.update_player(delta_time);
+        self.update_wave_spawner(delta_time);
         self.update_enemies(delta_time);
         self.update_word(delta_time);
-        self.update_enemy_spawner(delta_time);
     }
 }
 
@@ -130,7 +144,6 @@ impl InputConsumer for Level {
 impl Initializable for Level {
     fn initialize(&mut self) {
         self.player.initialize();
-
-        self.enemy_spawner.start_spawning();
+        self.wave_spawner.start_spawning();
     }
 }
