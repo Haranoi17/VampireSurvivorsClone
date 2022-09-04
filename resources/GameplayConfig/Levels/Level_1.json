@@ -1,0 +1,17 @@
+{
+    "name": "First Level",
+    "waves": [
+        {
+            "enemy_count": 10,
+            "enemy_spawn_delay_in_seconds": 1.0
+        },
+        {
+            "enemy_count": 40,
+            "enemy_spawn_delay_in_seconds": 0.5
+        },
+        {
+            "enemy_count": 50,
+            "enemy_spawn_delay_in_seconds": 0.1
+        }
+    ]
+}

@@ -1,31 +1,45 @@
-use sfml::graphics::{ RectangleShape, RenderTarget, Transformable};
+use sfml::graphics::{RectangleShape, RenderTarget, Transformable};
 use sfml::system::Vector2f;
 
-use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
-use crate::CollisionSystem::{Collidable, Collider, CollisionShape, Rectangle, CollisionMask, CollisionInfo};
+use crate::CollisionSystem::{
+    Collidable, Collider, CollisionInfo, CollisionMask, CollisionShape, Rectangle,
+};
 use crate::MathUtilities::{Position, Vector};
+use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
+
+pub mod EnemySpawners;
 
 pub struct Enemy {
     position: Position,
     rectangle: Rectangle,
     speed: f32,
+    health: f32,
 }
 
 impl Enemy {
-    pub fn new() -> Self {
+    pub fn new(position: Position) -> Self {
         Self {
-            position: Position::new(200.0, 200.0),
+            position: position,
             rectangle: Rectangle::new(40.0, 40.0),
-            speed: 5.0,
+            speed: 20.0,
+            health: 100.0,
         }
     }
 
-    pub fn walk_towards(&mut self, target_position: Position, delta_time: f32){
+    pub fn walk_towards(&mut self, target_position: Position, delta_time: f32) {
         let option_direction = (target_position - self.position).normal();
         let direction = match option_direction {
             Some(direction) => self.position += direction * self.speed * delta_time,
-            None => {},
+            None => {}
         };
+    }
+
+    fn prevent_walking_on_other_objects(&mut self, info: CollisionInfo) {
+        self.position = self.position - info.collision_depth;
+    }
+
+    pub fn should_be_destroyed(&self) -> bool {
+        self.health <= 0.0
     }
 }
 
@@ -39,7 +53,7 @@ impl Drawable for Enemy {
         let size = Vector::new(self.rectangle.width, self.rectangle.height);
         rect.set_size(size);
         rect.set_position(self.position);
-        rect.set_origin(size*0.5);
+        rect.set_origin(size * 0.5);
         window.draw(&rect);
     }
 }
@@ -59,11 +73,12 @@ impl Collidable for Enemy {
     fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask) {
         match other_mask {
             CollisionMask::Player => {
-                println!("Enemy collided with player");
-            },
+                self.prevent_walking_on_other_objects(info);
+            }
             CollisionMask::Enemy => {
-                // self.position += info.collision_direction
-            },
+                self.prevent_walking_on_other_objects(info);
+            }
+            CollisionMask::Weapon => self.health -= 10.0,
         }
     }
 }
