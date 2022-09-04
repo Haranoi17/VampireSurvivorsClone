@@ -23,5 +23,4 @@ fn main() {
 
     program.initialize();
     program.main_loop();
-    program.finish();   
 }

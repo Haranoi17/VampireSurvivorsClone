@@ -1,10 +1,11 @@
-use sfml::graphics::{Color, CircleShape, Transformable, Shape, RenderTarget};
-use crate::CollisionSystem::{Collider, CollisionMask, CollisionInfo};
+use crate::CollisionSystem::{Collider, CollisionInfo, CollisionMask};
+use sfml::graphics::{CircleShape, Color, RenderTarget, Shape, Transformable};
 
+use crate::Objects::Interfaces::Destroyable;
 use crate::{
-    CollisionSystem::{Circle, CollisionShape, Collidable},
+    CollisionSystem::{Circle, Collidable, CollisionShape},
     MathUtilities::{Position, Vector},
-    Objects::Interfaces::{Updatable, Drawable},
+    Objects::Interfaces::{Drawable, Updatable},
 };
 
 pub struct SimpleMissile {
@@ -15,31 +16,31 @@ pub struct SimpleMissile {
     shape: Circle,
     fly_direction: Vector,
     fly_distance: f32,
-    should_be_destroyed: bool
+    should_be_destroyed: bool,
 }
 
 impl SimpleMissile {
     pub fn new(start_position: Position, target_position: Position) -> Self {
         Self {
             start_position: start_position,
-            position:(start_position),
+            position: (start_position),
             damage: 10,
             speed: 200.0,
             fly_direction: (target_position - start_position).normal().unwrap(),
             fly_distance: 500.0,
             shape: Circle { radius: 5.0 },
-            should_be_destroyed: false
+            should_be_destroyed: false,
         }
     }
 
-    pub fn should_be_destroyed(&self)->bool{
+    pub fn should_be_destroyed(&self) -> bool {
         self.should_be_destroyed
     }
 }
 
 impl Updatable for SimpleMissile {
     fn update(&mut self, delta_time: f32) {
-        if (self.start_position - self.position).length() > self.fly_distance{
+        if (self.start_position - self.position).length() > self.fly_distance {
             self.should_be_destroyed = true;
         }
 
@@ -47,7 +48,7 @@ impl Updatable for SimpleMissile {
     }
 }
 
-impl Drawable for SimpleMissile{
+impl Drawable for SimpleMissile {
     fn draw(&mut self, window: &mut sfml::graphics::RenderWindow) {
         let mut visual_representation = CircleShape::new(self.shape.radius, 100);
         visual_representation.set_position(self.position);
@@ -58,7 +59,7 @@ impl Drawable for SimpleMissile{
     }
 }
 
-impl Collidable for SimpleMissile{
+impl Collidable for SimpleMissile {
     fn get_collider(&self) -> Collider {
         Collider {
             shape: CollisionShape::Circle(self.shape),
@@ -71,10 +72,16 @@ impl Collidable for SimpleMissile{
     }
 
     fn react_to_collision(&mut self, info: CollisionInfo, other_mask: CollisionMask) {
-        match other_mask{
-            CollisionMask::Player => {/* do nothing */},
-            CollisionMask::Weapon => {/* do nothing */},
-            CollisionMask::Enemy => {self.should_be_destroyed = true},
-        }       
+        match other_mask {
+            CollisionMask::Player => { /* do nothing */ }
+            CollisionMask::Weapon => { /* do nothing */ }
+            CollisionMask::Enemy => self.should_be_destroyed = true,
+        }
+    }
+}
+
+impl Destroyable for SimpleMissile {
+    fn should_be_destroyed(&self) -> bool {
+        self.should_be_destroyed
     }
 }

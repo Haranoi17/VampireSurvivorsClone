@@ -1,6 +1,5 @@
-use crate::Objects::Interfaces::{Updatable, Drawable};
-
-pub trait Spawner<T> {
+use crate::Objects::Interfaces::{Updatable};
+pub trait Spawner<T> : Updatable{
     fn start_spawning(&mut self);
     fn stop_spawning(&mut self);
     fn spawn(&mut self) -> Vec<T>;

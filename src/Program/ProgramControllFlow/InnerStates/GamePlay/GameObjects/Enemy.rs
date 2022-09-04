@@ -5,7 +5,7 @@ use crate::CollisionSystem::{
     Collidable, Collider, CollisionInfo, CollisionMask, CollisionShape, Rectangle,
 };
 use crate::MathUtilities::{Position, Vector};
-use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
+use crate::Objects::Interfaces::{Drawable, Initializable, Updatable, Destroyable};
 
 pub mod EnemySpawners;
 
@@ -36,10 +36,6 @@ impl Enemy {
 
     fn prevent_walking_on_other_objects(&mut self, info: CollisionInfo) {
         self.position = self.position - info.collision_depth;
-    }
-
-    pub fn should_be_destroyed(&self) -> bool {
-        self.health <= 0.0
     }
 }
 
@@ -80,5 +76,11 @@ impl Collidable for Enemy {
             }
             CollisionMask::Weapon => self.health -= 10.0,
         }
+    }
+}
+
+impl Destroyable for Enemy{
+    fn should_be_destroyed(&self) -> bool {
+        self.health <= 0.0
     }
 }
