@@ -60,6 +60,7 @@ pub struct Collider {
 #[derive(Clone, Copy)]
 pub enum CollisionMask {
     Player,
+    Weapon,
     Enemy,
 }
 

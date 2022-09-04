@@ -2,12 +2,13 @@ use crate::{CollisionSystem::{Collidable, CollisionShape, Circle, CollisionMask,
 use crate::Objects::Animations::AnimationPlayer;
 
 use sfml::{
-    graphics::{RenderTarget, RenderWindow, Transformable, Shape, CircleShape, Color},
-    window::Key,
+    graphics::{RenderTarget, RenderWindow, Transformable, Shape, CircleShape, Color}
 };
 
 use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
 use crate::CollisionSystem::Collider;
+
+pub mod WeaponSpawners;
 
 pub struct Player {
     animation_player: AnimationPlayer,
@@ -27,7 +28,6 @@ impl Player {
             move_direction: Vector::new(0.0, 0.0),
             speed: 200.0,
             collision_shape: CollisionShape::Circle(Circle::new(40.0)),
-            // collision_shape: CollisionShape::Rectangle(Rectangle::new(40.0, 40.0)),
             color: Color::RED
         }
     }
@@ -39,22 +39,6 @@ impl Player {
         visual_representation.set_fill_color(self.color);
         visual_representation
     }
-
-    // fn create_visual_representation(&self) -> RectangleShape {
-    //     let mut visual_representation = RectangleShape::new();
-    //     visual_representation.set_texture(self.animation_player.get_current_animation_frame(), false);
-    //     visual_representation.set_position(self.position);
-    //     visual_representation.set_size(Vector2f::new(30.0, 30.0));
-    //     visual_representation
-    // }
-
-    // fn create_visual_representation(&self) -> RectangleShape {
-    //     let mut visual_representation = RectangleShape::new();
-    //     visual_representation.set_position(self.position);
-    //     visual_representation.set_fill_color(self.color);
-    //     visual_representation.set_size(Vector2f::new(40.0, 40.0));
-    //     visual_representation
-    // }
 
     fn handle_movement(&mut self, input: &Input) {
         self.move_direction = Vector::new(0.0, 0.0);
@@ -136,6 +120,7 @@ impl Collidable for Player{
             CollisionMask::Enemy => {
                 self.prevent_walking_on_other_objects(info);
             },
+            CollisionMask::Weapon =>{/* do nothing */}
         }
     }
 }

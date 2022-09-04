@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use sfml::{
     graphics::{Color, Font, RenderTarget, Text, Transformable},
     window::Key,
@@ -7,7 +5,7 @@ use sfml::{
 };
 
 use crate::{
-    ControllFlow::{FlowState, StateMachine},
+    ControllFlow::{FlowState},
     InputSystem::{InputConsumer, Keys},
     MathUtilities::Vector,
     Objects::Interfaces::{Drawable, Updatable},

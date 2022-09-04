@@ -82,14 +82,14 @@ impl WordSymulation {
             let collision_pair = symulation_collision_info.collided_objects_indices;
             let first = collidables.get_mut(collision_pair.first).unwrap();
             
-            first.react_to_collision(symulation_collision_info.info, symulation_collision_info.masks.first);
+            first.react_to_collision(symulation_collision_info.info, symulation_collision_info.masks.second);
         }
 
         for symulation_collision_info in symulation_collisions_info {
             let collision_pair = symulation_collision_info.collided_objects_indices;
             let second = collidables.get_mut(collision_pair.second).unwrap();
             
-            second.react_to_collision(symulation_collision_info.info.symetrical(), symulation_collision_info.masks.second);
+            second.react_to_collision(symulation_collision_info.info.symetrical(), symulation_collision_info.masks.first);
         }
 
     }

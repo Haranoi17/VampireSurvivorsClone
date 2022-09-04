@@ -4,7 +4,7 @@ use sfml::graphics::RenderWindow;
 
 use crate::{
     InputSystem::InputConsumer,
-    Objects::Interfaces::{Drawable, Initializable, Updatable},
+    Objects::Interfaces::{Drawable, Updatable},
 };
 
 use self::GameObjects::Level::{Level, LevelConfiguration};

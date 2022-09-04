@@ -2,21 +2,13 @@ use rand::{thread_rng, Rng};
 use crate::{
     MathUtilities::Position,
     Objects::{
-        Interfaces::Updatable,
+        Interfaces::{Updatable},
         Timers::{BasicTimer, Timer},
     },
-    Program::ProgramControllFlow::InnerStates::GamePlay::GameObjects::Level::Wave,
+    Program::ProgramControllFlow::InnerStates::GamePlay::GameObjects::{Level::Wave, Spawner::Spawner},
 };
 
 use super::Enemy;
-
-pub trait Spawner {
-    fn start_spawning(&mut self);
-    fn stop_spawning(&mut self);
-    fn spawn(&mut self) -> Vec<Enemy>;
-    fn should_spawn(&self) -> bool;
-    fn finished_spawning(&self) -> bool;
-}
 
 pub struct WaveSpawner {
     timer: BasicTimer,
@@ -31,7 +23,7 @@ impl WaveSpawner {
     }
 }
 
-impl Spawner for WaveSpawner {
+impl Spawner<Enemy> for WaveSpawner {
     fn start_spawning(&mut self) {
         self.timer.start();
     }
