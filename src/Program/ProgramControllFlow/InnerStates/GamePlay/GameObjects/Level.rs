@@ -7,7 +7,7 @@ use crate::{
     InputSystem::{Input, InputConsumer},
     MathUtilities::Position,
     Objects::{
-        Interfaces::{Drawable, Initializable, Updatable},
+        Interfaces::{Destroyable, Drawable, Initializable, Updatable},
         Timers::{BasicTimer, Timer},
     },
 };
@@ -78,12 +78,7 @@ impl Level {
             enemy.walk_towards(self.player.get_position(), delta_time);
         }
 
-        let to_delete = self.get_indices_of_enemies_to_delete();
-
-        for i in 0..to_delete.len() {
-            //after removing element rest of them are being shifted by one to the left so next element to remove is its index minus removed elements count
-            self.enemies.remove(to_delete.get(i).unwrap() - i);
-        }
+        Level::delete_objects_ready_to_destroy(&mut self.enemies);
     }
 
     fn update_weapons(&mut self, delta_time: f32) {
@@ -91,37 +86,28 @@ impl Level {
             weapon.update(delta_time);
         }
 
-        let to_delete = self.get_indices_of_weapons_to_delete();
+       Level::delete_objects_ready_to_destroy(&mut self.weapons);
+    }
 
+    fn delete_objects_ready_to_destroy<T>(destroyables: &mut Vec<T>) where T: Destroyable{
+        let to_delete = Level::get_indices_of_objects_to_delete(&destroyables);
         for i in 0..to_delete.len() {
             //after removing element rest of them are being shifted by one to the left so next element to remove is its index minus removed elements count
-            self.weapons.remove(to_delete.get(i).unwrap() - i);
+            destroyables.remove(to_delete.get(i).unwrap() - i);
         }
     }
 
-    //To Do: DRY - implement destroyable trait...
-    fn get_indices_of_weapons_to_delete(&self) -> Vec<usize> {
+    fn get_indices_of_objects_to_delete<T>(destroyables: &Vec<T>) -> Vec<usize> where T: Destroyable{
         let mut to_delete: Vec<usize> = vec![];
-        for i in 0..self.weapons.len() {
-            if self.weapons.get(i).unwrap().should_be_destroyed() {
+        for i in 0..destroyables.len() {
+            if destroyables.get(i).unwrap().should_be_destroyed() {
                 to_delete.push(i);
             }
         }
 
         to_delete
     }
-
-    fn get_indices_of_enemies_to_delete(&self) -> Vec<usize> {
-        let mut to_delete: Vec<usize> = vec![];
-        for i in 0..self.enemies.len() {
-            if self.enemies.get(i).unwrap().should_be_destroyed() {
-                to_delete.push(i);
-            }
-        }
-
-        to_delete
-    }
-
+    
     fn update_wave_spawner(&mut self, delta_time: f32) {
         self.wave_spawner.update(delta_time);
 

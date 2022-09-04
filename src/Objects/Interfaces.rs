@@ -9,5 +9,9 @@ pub trait Drawable {
 }
 
 pub trait Initializable {
-    fn initialize(&mut self){}
+    fn initialize(&mut self);
+}
+
+pub trait Destroyable {
+    fn should_be_destroyed(&self) -> bool;
 }

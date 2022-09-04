@@ -51,8 +51,6 @@ impl Program {
         self.states.draw(&mut self.window);
         self.window.display();
     }
-
-    pub fn finish(&mut self) {}
     
     fn handle_events(&mut self) {
         while let Some(event) = self.window.poll_event() {
