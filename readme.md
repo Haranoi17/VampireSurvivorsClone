@@ -3,6 +3,7 @@
 
 ---
 #Development notes
+dlls are provided in sfml folder.
 
 Start app:
 ```batch
