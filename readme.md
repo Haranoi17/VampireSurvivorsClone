@@ -1,5 +1,5 @@
 #Gameplay Gif
-![til](./misc/gameplay.gif)
+![til](./misc/gameplay.GIF)
 
 ---
 #Development notes
