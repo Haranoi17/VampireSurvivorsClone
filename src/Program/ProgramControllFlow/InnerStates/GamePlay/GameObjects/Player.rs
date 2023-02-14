@@ -1,8 +1,10 @@
-use crate::{CollisionSystem::{Collidable, CollisionShape, Circle, CollisionMask, CollisionInfo}, MathUtilities::{Vector, Point, Position}, InputSystem::{InputConsumer, Input, Keys}};
+use std::sync::mpsc::Receiver;
+
+use crate::{CollisionSystem::{Collidable, CollisionShape, Circle, CollisionMask, CollisionInfo}, MathUtilities::{Vector, Point, Position, self}, InputSystem::{InputConsumer, Input, Keys}};
 use crate::Objects::Animations::AnimationPlayer;
 
 use sfml::{
-    graphics::{RenderTarget, RenderWindow, Transformable, Shape, CircleShape, Color}
+    graphics::{RenderTarget, RenderWindow, Transformable, Shape, CircleShape, Color, Sprite, RectangleShape}, system::Vector2f
 };
 
 use crate::Objects::Interfaces::{Drawable, Initializable, Updatable};
@@ -17,7 +19,8 @@ pub struct Player {
     move_direction: Vector,
     speed: f32,
     collision_shape: CollisionShape,
-    color: Color
+    color: Color,
+    face_direction: i8,
 }
 
 impl Player {
@@ -28,15 +31,24 @@ impl Player {
             move_direction: Vector::new(0.0, 0.0),
             speed: 200.0,
             collision_shape: CollisionShape::Circle(Circle::new(40.0)),
-            color: Color::RED
+            color: Color::RED,
+            face_direction: 1
         }
     }
 
-    fn create_visual_representation(&self) -> CircleShape {
-        let mut visual_representation = CircleShape::new(40.0, 100);
+    fn create_visual_representation(&self) -> RectangleShape {
+        let size: Vector2f = match self.collision_shape {
+            CollisionShape::Circle(circle) => {Vector2f::new(circle.radius*2.0, circle.radius*2.0)}
+            CollisionShape::Rectangle(rectangle) =>{Vector2f::new(rectangle.width, rectangle.height)}
+        };
+        
+        let texture = self.animation_player.get_current_animation_frame();
+        
+        let mut visual_representation = RectangleShape::with_size(size);
+        visual_representation.set_texture(texture, false);
         visual_representation.set_position(self.position);
-        visual_representation.set_origin(Vector::new(40.0,40.0));
-        visual_representation.set_fill_color(self.color);
+        visual_representation.set_origin(size/2.0);
+        visual_representation.set_scale(Vector2f::new(1.5*self.face_direction as f32, 1.5));
         visual_representation
     }
 
@@ -62,6 +74,17 @@ impl Player {
         self.move_direction = self.move_direction.normal().unwrap_or_default();
     }
 
+    fn update_face_direction(&mut self)
+    {
+        if(self.move_direction.get_x() > 0.0)
+        {
+            self.face_direction = 1;
+        }
+        else if (self.move_direction.get_x() < 0.0) {
+            self.face_direction = -1;
+        }
+    }
+
     fn update_position(&mut self, delta_time: f32) {
         self.position += self.move_direction * self.speed * delta_time;
     }
@@ -83,9 +106,8 @@ impl Updatable for Player {
     fn update(&mut self, delta_time: f32) {
         self.animation_player.update(delta_time);
 
+        self.update_face_direction();
         self.update_position(delta_time);
-
-        self.color = Color::RED;
     }
 }
 

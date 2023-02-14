@@ -1,3 +1,6 @@
+#Gameplay Gif
+![til](./misc/gameplay.gif)
+
 ---
 #Development notes
 
